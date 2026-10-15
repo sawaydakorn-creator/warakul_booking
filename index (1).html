@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ห้องพักรายวันบ้านวรากุล@ภาสว่าง</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf6f0;--card:#fff;--tx:#2b2a28;--mu:#7a746b;--ac:#b4541f;--ac2:#f3e3d6;--bd:#e6ddd0;--ok:#2f7d4f;--bad:#b3261e;--red:#c62828;--redbg:#fde8e8;--grn:#2e7d32;--grnbg:#e3f4e6}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1a18;--card:#26231f;--tx:#f1ece4;--mu:#a69f94;--ac:#e8895a;--ac2:#3a2c22;--bd:#3a352f;--ok:#6cc08b;--bad:#f2766d;--red:#e0584f;--redbg:#4a2523;--grn:#4caf6a;--grnbg:#1f3a28}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Sarabun,system-ui,sans-serif}
+header{padding:28px 16px 12px;text-align:center}
+h1{margin:0;font-size:1.6rem;color:var(--ac)}
+header p{margin:4px 0 0;color:var(--mu)}
+nav{display:flex;gap:6px;justify-content:center;padding:8px;position:sticky;top:0;background:var(--bg);z-index:5}
+nav button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 16px;border-radius:999px;font:inherit;cursor:pointer}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:860px;margin:0 auto;padding:12px 16px 60px}
+.page{display:none}.page.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:16px}
+h2{font-size:1.15rem;margin:0 0 12px}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;font:inherit;background:var(--bg);color:var(--tx)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+.err{color:var(--bad);font-size:.9rem;min-height:1.2em}
+.btn{background:var(--ac);color:#fff;border:0;padding:12px 20px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;width:100%;margin-top:14px}
+.btn.alt{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.room{border:2px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--card)}
+.room.sel{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
+.room.off{opacity:.45;cursor:not-allowed}
+.ph{aspect-ratio:4/3;background:var(--ac2) center/cover;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.9rem;position:relative}
+.ph.has{aspect-ratio:auto;display:block;background:none}.ph img{width:100%;display:block}
+.ph label{position:absolute;right:6px;bottom:6px;margin:0;background:var(--ac);color:#fff;padding:3px 10px;border-radius:8px;font-size:.8rem;cursor:pointer}
+.ph input{display:none}
+.room .in{padding:10px 12px}
+.room b{font-size:1.05rem}
+.tag{font-size:.8rem;padding:2px 8px;border-radius:999px;background:var(--ac2);color:var(--ac)}
+.tag.bad{color:var(--bad)}
+table.sum{width:100%;border-collapse:collapse}
+.sum td{padding:8px 0;border-bottom:1px solid var(--bd)}.sum td:first-child{color:var(--mu);width:42%}
+.total{font-size:1.4rem;color:var(--ac);font-weight:700}
+.ok{background:var(--ac2);border-radius:12px;padding:14px;text-align:center;color:var(--ok);font-weight:700;margin-bottom:12px}
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-h button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:6px 14px;cursor:pointer;font:inherit}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .d{font-weight:700;text-align:center;color:var(--mu);font-size:.85rem}
+.cell{min-height:78px;border:1px solid var(--bd);border-radius:8px;padding:3px;font-size:.72rem;background:var(--card);overflow:hidden}
+.cell.e{background:transparent;border:0}
+.cell .n{font-weight:700;font-size:.8rem}
+.chip{display:block;background:var(--ac);color:#fff;border-radius:4px;padding:0 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.occ{background:var(--redbg);border-color:var(--red)}
+.cell.outd{background:var(--grnbg);border-color:var(--grn)}
+.chip.r{background:var(--red)}.chip.g{background:var(--grn)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:.9rem}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+.note{color:var(--mu);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏡 ห้องพักรายวันบ้านวรากุล@ภาสว่าง</h1>
+  <p>จองห้องพักรายวัน ง่าย สะดวก</p>
+</header>
+<nav>
+  <button class="on" data-p="p1">1. จองห้อง</button>
+  <button data-p="p2">2. สรุปการจอง</button>
+  <button data-p="p3">3. ปฏิทิน</button>
+</nav>
+<main>
+
+<section id="p1" class="page on">
+  <div class="card">
+    <h2>ลงทะเบียนผู้เข้าพัก</h2>
+    <label>ชื่อ - นามสกุล</label><input id="name" placeholder="เช่น สมชาย ใจดี" autocomplete="name">
+    <label>เลขบัตรประชาชน 13 หลัก</label><input id="idc" inputmode="numeric" maxlength="13" placeholder="ตัวเลข 13 หลัก">
+    <label>เบอร์โทรศัพท์</label><input id="tel" type="tel" inputmode="numeric" maxlength="10" placeholder="0812345678">
+    <div class="row">
+      <div><label>วันที่ Check-In</label><input id="cin" type="date"></div>
+      <div><label>วันที่ Check-Out</label><input id="cout" type="date"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>เลือกห้องพัก</h2>
+    <div class="rooms" id="rooms"></div>
+    <p class="note" id="hint">เลือกวันที่เข้าพักและออก เพื่อดูห้องที่ว่าง</p>
+  </div>
+  <div class="err" id="err"></div>
+  <button class="btn" id="go">ยืนยันการจอง</button>
+</section>
+
+<section id="p2" class="page">
+  <div class="card" id="sumBox"><p class="note">ยังไม่มีรายการจอง กรุณากรอกข้อมูลที่หน้าแรก</p></div>
+</section>
+
+<section id="p3" class="page">
+  <div class="card">
+    <div class="cal-h"><button id="prev">◀</button><b id="mt"></b><button id="next">▶</button></div>
+    <div class="cal" id="cal"></div>
+    <div class="legend"><span><i style="background:var(--red)"></i>วันที่มีการจอง (เข้าพัก)</span><span><i style="background:var(--grn)"></i>วันที่ Check-Out ออก</span></div>
+    <p class="note" id="syncNote"></p>
+  </div>
+</section>
+
+</main>
+<script>
+// ====== ตั้งค่า: วาง URL ของ Google Apps Script Web App ตรงนี้ (ดูวิธีใน Code.gs) ======
+const API_URL = "https://script.google.com/macros/s/AKfycbxGMc3SiQNThjVC2HglrI3BzhAyCsAlcgzJWye15AJfgWiMVPFrsguywVcT0UKsIa1vFw/exec";
+// ================================================================================
+const ROOMS=[{id:"W1",price:600},{id:"W2",price:600},{id:"W3",price:700},{id:"W4",price:600},{id:"W5",price:600}];
+const $=s=>document.querySelector(s);
+const isAdmin=location.hash==="#admin";
+let bookings=[],photos={},sel=null,last=null,cur=new Date();cur.setDate(1);
+const fmt=d=>new Date(d+"T00:00:00").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
+const nights=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const taken=(r,a,b)=>bookings.some(x=>x.room===r&&a<x.out&&b>x.in);
+const nd=v=>{v=String(v);if(/^\d{4}-\d\d-\d\d/.test(v))return v.slice(0,10);const d=new Date(v);if(isNaN(d))return v;return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---- storage (Google Drive via Apps Script, หรือ localStorage หากยังไม่ตั้งค่า) ----
+async function load(){
+  window._le="";try{
+    if(API_URL){const j=await (await fetch(API_URL+"?action=list")).json();if(j.error)throw new Error(j.error);bookings=j.bookings;photos=j.photos||{};}
+    else{bookings=JSON.parse(localStorage.getItem("wb_b")||"[]");photos=JSON.parse(localStorage.getItem("wb_p")||"{}");}
+  }catch(e){window._le=e.message;}
+  bookings=bookings.map(x=>({...x,in:nd(x.in),out:nd(x.out)}));
+  $("#syncNote").textContent=window._le?"โหลดข้อมูลไม่สำเร็จ: "+window._le:API_URL?"ข้อมูลเชื่อมต่อกับ Google Drive":"โหมดทดสอบ: ข้อมูลเก็บในเครื่อง (ยังไม่ได้ตั้งค่า Google Drive)";
+  drawRooms();drawCal();
+}
+async function save(b){
+  if(API_URL){
+    const r=await (await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"book",...b})})).json();
+    if(!r.ok)throw new Error(r.error||"บันทึกไม่สำเร็จ");
+  }else{bookings.push({name:b.name,room:b.room,in:b.in,out:b.out});
+    localStorage.setItem("wb_b",JSON.stringify(bookings));}
+}
+async function savePhoto(room,file){
+  const data=await new Promise(res=>{const im=new Image(),fr=new FileReader();
+    fr.onload=()=>{im.onload=()=>{const c=document.createElement("canvas"),k=Math.min(1,800/im.width);
+      c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.8));};im.src=fr.result;};
+    fr.readAsDataURL(file);});
+  if(API_URL){const r=await (await fetch(API_URL,{method:"POST",body:JSON.stringify({action:"photo",room,data})})).json();photos[room]=r.url;}
+  else{photos[room]=data;localStorage.setItem("wb_p",JSON.stringify(photos));}
+  drawRooms();
+}
+
+// ---- rooms ----
+function drawRooms(){
+  const a=$("#cin").value,b=$("#cout").value,ok=a&&b&&b>a;
+  if(sel&&ok&&taken(sel,a,b))sel=null;
+  $("#rooms").innerHTML=ROOMS.map(r=>{
+    const off=ok&&taken(r.id,a,b);
+    return `<div class="room ${sel===r.id?"sel":""} ${off?"off":""}" data-r="${r.id}">
+      <div class="ph ${photos[r.id]?"has":""}">${photos[r.id]?`<img src="${photos[r.id]}" alt="ห้อง ${r.id}">`:"📷 รูปห้อง "+r.id}
+        ${isAdmin?`<label>อัปโหลดรูป<input type="file" accept="image/*" data-up="${r.id}"></label>`:""}</div>
+      <div class="in"><b>${r.id}</b> · เตียงเดียว<br>${r.price} บาท/คืน
+      ${ok?`<span class="tag ${off?"bad":""}">${off?"ไม่ว่าง":"ว่าง"}</span>`:""}</div></div>`}).join("");
+}
+$("#rooms").onclick=e=>{
+  const up=e.target.closest("[data-up]");if(up)return;
+  if(e.target.closest("label"))return;
+  const el=e.target.closest(".room");if(!el||el.classList.contains("off"))return;
+  sel=el.dataset.r;drawRooms();
+};
+$("#rooms").onchange=e=>{if(e.target.dataset.up)savePhoto(e.target.dataset.up,e.target.files[0]);};
+["cin","cout"].forEach(i=>$("#"+i).onchange=drawRooms);
+const today=new Date().toISOString().slice(0,10);$("#cin").min=today;$("#cout").min=today;
+$("#cin").addEventListener("change",()=>{$("#cout").min=$("#cin").value||today;});
+$("#idc").oninput=e=>e.target.value=e.target.value.replace(/\D/g,"");
+$("#tel").oninput=e=>e.target.value=e.target.value.replace(/\D/g,"");
+
+// ---- submit ----
+$("#go").onclick=async()=>{
+  const name=$("#name").value.trim(),idc=$("#idc").value,tel=$("#tel").value,a=$("#cin").value,b=$("#cout").value;
+  const er=m=>($("#err").textContent=m,false);
+  if(!name)return er("กรุณากรอกชื่อ - นามสกุล");
+  if(!/^\d{13}$/.test(idc))return er("เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลักเท่านั้น");
+  if(!/^0\d{8,9}$/.test(tel))return er("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง");
+  if(!a||!b)return er("กรุณาเลือกวันที่ Check-In และ Check-Out");
+  if(b<=a)return er("วันที่ Check-Out ต้องอยู่หลังวันที่ Check-In");
+  if(!sel)return er("กรุณาเลือกห้องพัก");
+  if(taken(sel,a,b))return er("ห้องนี้ไม่ว่างในช่วงวันที่เลือก");
+  $("#err").textContent="";$("#go").disabled=true;$("#go").textContent="กำลังบันทึก...";
+  try{
+    await save({name,idc,tel,room:sel,in:a,out:b});
+    const rm=ROOMS.find(r=>r.id===sel),n=nights(a,b);
+    last={name,tel,idc,room:sel,in:a,out:b,n,total:n*rm.price,price:rm.price};
+    await load();drawSum();show("p2");
+    ["name","idc","tel","cin","cout"].forEach(i=>$("#"+i).value="");sel=null;drawRooms();
+  }catch(e){$("#err").textContent=e.message;await load();}
+  $("#go").disabled=false;$("#go").textContent="ยืนยันการจอง";
+};
+
+// ---- summary ----
+function drawSum(){
+  if(!last)return;const l=last;
+  $("#sumBox").innerHTML=`<div class="ok">✅ จองห้องพักเรียบร้อยแล้ว</div><h2>สรุปรายการจองห้องพัก</h2>
+  <table class="sum">
+  <tr><td>ชื่อผู้จอง</td><td>${esc(l.name)}</td></tr>
+  <tr><td>เลขบัตรประชาชน</td><td>${l.idc.slice(0,1)}-XXXX-XXXXX-${l.idc.slice(10,12)}-${l.idc.slice(12)}</td></tr>
+  <tr><td>เบอร์โทรศัพท์</td><td>${esc(l.tel)}</td></tr>
+  <tr><td>ห้องพัก</td><td>${l.room} (เตียงเดียว) ${l.price} บาท/คืน</td></tr>
+  <tr><td>Check-In</td><td>${fmt(l.in)}</td></tr>
+  <tr><td>Check-Out</td><td>${fmt(l.out)}</td></tr>
+  <tr><td>จำนวนคืน</td><td>${l.n} คืน</td></tr>
+  <tr><td>ยอดรวม</td><td class="total">${l.total.toLocaleString()} บาท</td></tr></table>
+  <button class="btn alt" onclick="show('p3')">ดูปฏิทินการจอง</button>`;
+}
+
+// ---- calendar ----
+function drawCal(){
+  const y=cur.getFullYear(),m=cur.getMonth(),days=new Date(y,m+1,0).getDate(),st=new Date(y,m,1).getDay();
+  $("#mt").textContent=cur.toLocaleDateString("th-TH",{month:"long",year:"numeric"});
+  let h=["อา","จ","อ","พ","พฤ","ศ","ส"].map(d=>`<div class="d">${d}</div>`).join("")+'<div class="cell e"></div>'.repeat(st);
+  for(let d=1;d<=days;d++){
+    const k=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const bs=bookings.filter(x=>k>=x.in&&k<x.out),os=bookings.filter(x=>x.out===k);
+    h+=`<div class="cell ${bs.length?"occ":os.length?"outd":""}"><div class="n">${d}</div>${bs.map(x=>`<span class="chip r" title="${esc(x.name)} ${x.room}">${x.room} ${esc(x.name)}</span>`).join("")}${os.map(x=>`<span class="chip g" title="${esc(x.name)} ${x.room} ออก">${x.room} ${esc(x.name)} ออก</span>`).join("")}</div>`;
+  }
+  $("#cal").innerHTML=h;
+}
+$("#prev").onclick=()=>{cur.setMonth(cur.getMonth()-1);drawCal();};
+$("#next").onclick=()=>{cur.setMonth(cur.getMonth()+1);drawCal();};
+
+// ---- nav ----
+function show(p){document.querySelectorAll(".page").forEach(e=>e.classList.toggle("on",e.id===p));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));scrollTo(0,0);}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.p==="p2")drawSum();show(b.dataset.p);});
+load();
+</script>
+</body>
+</html>
