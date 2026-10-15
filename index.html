@@ -6,8 +6,8 @@
 <title>ห้องพักรายวันบ้านวรากุล@ภาสว่าง</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#faf6f0;--card:#fff;--tx:#2b2a28;--mu:#7a746b;--ac:#b4541f;--ac2:#f3e3d6;--bd:#e6ddd0;--ok:#2f7d4f;--bad:#b3261e}
-@media(prefers-color-scheme:dark){:root{--bg:#1c1a18;--card:#26231f;--tx:#f1ece4;--mu:#a69f94;--ac:#e8895a;--ac2:#3a2c22;--bd:#3a352f;--ok:#6cc08b;--bad:#f2766d}}
+:root{--bg:#faf6f0;--card:#fff;--tx:#2b2a28;--mu:#7a746b;--ac:#b4541f;--ac2:#f3e3d6;--bd:#e6ddd0;--ok:#2f7d4f;--bad:#b3261e;--red:#c62828;--redbg:#fde8e8;--grn:#2e7d32;--grnbg:#e3f4e6}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1a18;--card:#26231f;--tx:#f1ece4;--mu:#a69f94;--ac:#e8895a;--ac2:#3a2c22;--bd:#3a352f;--ok:#6cc08b;--bad:#f2766d;--red:#e0584f;--redbg:#4a2523;--grn:#4caf6a;--grnbg:#1f3a28}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Sarabun,system-ui,sans-serif}
 header{padding:28px 16px 12px;text-align:center}
@@ -32,6 +32,7 @@ input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px
 .room.sel{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2)}
 .room.off{opacity:.45;cursor:not-allowed}
 .ph{aspect-ratio:4/3;background:var(--ac2) center/cover;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.9rem;position:relative}
+.ph.has{aspect-ratio:auto;display:block;background:none}.ph img{width:100%;display:block}
 .ph label{position:absolute;right:6px;bottom:6px;margin:0;background:var(--ac);color:#fff;padding:3px 10px;border-radius:8px;font-size:.8rem;cursor:pointer}
 .ph input{display:none}
 .room .in{padding:10px 12px}
@@ -50,6 +51,11 @@ table.sum{width:100%;border-collapse:collapse}
 .cell.e{background:transparent;border:0}
 .cell .n{font-weight:700;font-size:.8rem}
 .chip{display:block;background:var(--ac);color:#fff;border-radius:4px;padding:0 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell.occ{background:var(--redbg);border-color:var(--red)}
+.cell.outd{background:var(--grnbg);border-color:var(--grn)}
+.chip.r{background:var(--red)}.chip.g{background:var(--grn)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:.9rem}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
 .note{color:var(--mu);font-size:.85rem}
 </style>
 </head>
@@ -93,6 +99,7 @@ table.sum{width:100%;border-collapse:collapse}
   <div class="card">
     <div class="cal-h"><button id="prev">◀</button><b id="mt"></b><button id="next">▶</button></div>
     <div class="cal" id="cal"></div>
+    <div class="legend"><span><i style="background:var(--red)"></i>วันที่มีการจอง (เข้าพัก)</span><span><i style="background:var(--grn)"></i>วันที่ Check-Out ออก</span></div>
     <p class="note" id="syncNote"></p>
   </div>
 </section>
@@ -109,6 +116,7 @@ let bookings=[],photos={},sel=null,last=null,cur=new Date();cur.setDate(1);
 const fmt=d=>new Date(d+"T00:00:00").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
 const nights=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
 const taken=(r,a,b)=>bookings.some(x=>x.room===r&&a<x.out&&b>x.in);
+const nd=v=>{v=String(v);if(/^\d{4}-\d\d-\d\d/.test(v))return v.slice(0,10);const d=new Date(v);if(isNaN(d))return v;return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 // ---- storage (Google Drive via Apps Script, หรือ localStorage หากยังไม่ตั้งค่า) ----
@@ -117,6 +125,7 @@ async function load(){
     if(API_URL){const j=await (await fetch(API_URL+"?action=list")).json();if(j.error)throw new Error(j.error);bookings=j.bookings;photos=j.photos||{};}
     else{bookings=JSON.parse(localStorage.getItem("wb_b")||"[]");photos=JSON.parse(localStorage.getItem("wb_p")||"{}");}
   }catch(e){window._le=e.message;}
+  bookings=bookings.map(x=>({...x,in:nd(x.in),out:nd(x.out)}));
   $("#syncNote").textContent=window._le?"โหลดข้อมูลไม่สำเร็จ: "+window._le:API_URL?"ข้อมูลเชื่อมต่อกับ Google Drive":"โหมดทดสอบ: ข้อมูลเก็บในเครื่อง (ยังไม่ได้ตั้งค่า Google Drive)";
   drawRooms();drawCal();
 }
@@ -144,7 +153,7 @@ function drawRooms(){
   $("#rooms").innerHTML=ROOMS.map(r=>{
     const off=ok&&taken(r.id,a,b);
     return `<div class="room ${sel===r.id?"sel":""} ${off?"off":""}" data-r="${r.id}">
-      <div class="ph" style="${photos[r.id]?`background-image:url('${photos[r.id]}')`:""}">${photos[r.id]?"":"📷 รูปห้อง "+r.id}
+      <div class="ph ${photos[r.id]?"has":""}">${photos[r.id]?`<img src="${photos[r.id]}" alt="ห้อง ${r.id}">`:"📷 รูปห้อง "+r.id}
         ${isAdmin?`<label>อัปโหลดรูป<input type="file" accept="image/*" data-up="${r.id}"></label>`:""}</div>
       <div class="in"><b>${r.id}</b> · เตียงเดียว<br>${r.price} บาท/คืน
       ${ok?`<span class="tag ${off?"bad":""}">${off?"ไม่ว่าง":"ว่าง"}</span>`:""}</div></div>`}).join("");
@@ -207,8 +216,8 @@ function drawCal(){
   let h=["อา","จ","อ","พ","พฤ","ศ","ส"].map(d=>`<div class="d">${d}</div>`).join("")+'<div class="cell e"></div>'.repeat(st);
   for(let d=1;d<=days;d++){
     const k=`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-    const bs=bookings.filter(x=>k>=x.in&&k<x.out);
-    h+=`<div class="cell"><div class="n">${d}</div>${bs.map(x=>`<span class="chip" title="${esc(x.name)} ${x.room}">${x.room} ${esc(x.name)}</span>`).join("")}</div>`;
+    const bs=bookings.filter(x=>k>=x.in&&k<x.out),os=bookings.filter(x=>x.out===k);
+    h+=`<div class="cell ${bs.length?"occ":os.length?"outd":""}"><div class="n">${d}</div>${bs.map(x=>`<span class="chip r" title="${esc(x.name)} ${x.room}">${x.room} ${esc(x.name)}</span>`).join("")}${os.map(x=>`<span class="chip g" title="${esc(x.name)} ${x.room} ออก">${x.room} ${esc(x.name)} ออก</span>`).join("")}</div>`;
   }
   $("#cal").innerHTML=h;
 }
